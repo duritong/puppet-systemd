@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'systemd::mail_on_failure' do
@@ -8,6 +10,7 @@ describe 'systemd::mail_on_failure' do
 
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to create_class('systemd::mail_on_failure') }
+
         it {
           is_expected.to contain_file('/usr/local/bin/systemd-email').with(
             content: %r{sendmail},
@@ -16,16 +19,19 @@ describe 'systemd::mail_on_failure' do
             mode: '0750',
           )
         }
+
         # for some reason facts['networking']['fqdn'] is not valid
         it { is_expected.to contain_systemd__unit_file('status_email_root@.service').with_content(%r{root@%H}) }
         it { is_expected.to contain_systemd__unit_file('status_email_root@.service').that_requires('File[/usr/local/bin/systemd-email]') }
       end
+
       context "on #{os} with params" do
         let(:facts) { facts }
         let(:params) { { email_users: ['root', 'admin', 'monitoring@example.com'] } }
 
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to create_class('systemd::mail_on_failure') }
+
         it {
           is_expected.to contain_file('/usr/local/bin/systemd-email').with(
             content: %r{sendmail},
@@ -34,6 +40,7 @@ describe 'systemd::mail_on_failure' do
             mode: '0750',
           )
         }
+
         it { is_expected.to contain_systemd__unit_file('status_email_root@.service').with_content(%r{root@%H}) }
         it { is_expected.to contain_systemd__unit_file('status_email_root@.service').that_requires('File[/usr/local/bin/systemd-email]') }
         it { is_expected.to contain_systemd__unit_file('status_email_admin@.service').with_content(%r{admin@%H}) }
